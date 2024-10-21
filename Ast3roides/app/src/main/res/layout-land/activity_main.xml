@@ -32,7 +32,6 @@
             android:id="@+id/button"
             android:layout_width="180dp"
             android:layout_height="55dp"
-            android:capitalize="words"
 
             android:text="@string/jugar"
             android:textSize="20sp"
@@ -44,7 +43,6 @@
             android:id="@+id/button2"
             android:layout_width="180dp"
             android:layout_height="55dp"
-            android:capitalize="words"
 
             android:text="@string/configurar"
             android:textSize="20sp"
@@ -53,10 +51,9 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/aboutBtn"
             android:layout_width="180dp"
             android:layout_height="55dp"
-            android:capitalize="words"
 
             android:text="@string/sobre"
             android:textSize="20sp"
@@ -65,11 +62,10 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/quitBtn"
             android:layout_width="180dp"
             android:layout_height="55dp"
 
-            android:capitalize="words"
             android:text="@string/sortir"
             android:textSize="20sp"
             app:cornerRadius="20px"

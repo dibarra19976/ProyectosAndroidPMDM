@@ -57,7 +57,7 @@
             app:cornerRadius="20px" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/aboutBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -69,11 +69,10 @@
             app:cornerRadius="20px" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/quitBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:capitalize="words"
             android:insetTop="5dp"
             android:insetBottom="5dp"
             android:text="@string/sortir"
