@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Asteroides</string>
+    <string name="configurar">AJUSTES</string>
+    <string name="sobre">SOBRE</string>
+    <string name="sortir">SALIR</string>
+    <string name="jugar">JUGAR</string>
+    <string name="asteroides">Asteroides</string>
+</resources>
