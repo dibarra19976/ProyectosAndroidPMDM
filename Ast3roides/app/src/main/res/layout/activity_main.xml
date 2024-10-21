@@ -45,7 +45,7 @@
             app:cornerRadius="20px" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/settingsBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"

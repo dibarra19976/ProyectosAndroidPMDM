@@ -5,5 +5,7 @@
     <string name="sortir">QUIT</string>
     <string name="jugar">PLAY</string>
     <string name="asteroides">Asteroids</string>
-    <string name="aboutString">APLICACION: Asteroides \nCREADOR: Daniel Angel Ibarra Moran \nAÑO DE CREACION: 2024 \nFECHA DE LA VERSION: 2024-10-21</string>
+    <string name="aboutString">APP: Asteroides \nDEVELOPER: Daniel Angel Ibarra Moran \nCREATION YEAR: 2024 \nLATEST VERSION DATE: 2024-10-21</string>
+    <string name="preferencias">Preferences</string>
+    <string name="sobreMenu">About...</string>
 </resources>

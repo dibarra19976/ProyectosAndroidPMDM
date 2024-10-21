@@ -2,10 +2,13 @@ package com.daniibarra.ast3roides;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -14,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
     Button quitBtn;
     Button aboutBtn;
+    Button settingsBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         quitBtn = findViewById(R.id.quitBtn);
         aboutBtn = findViewById(R.id.aboutBtn);
+        settingsBtn = findViewById(R.id.settingsBtn);
+
         quitBtn.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -34,6 +40,13 @@ public class MainActivity extends AppCompatActivity {
                 runAboutClass((view));
             }
         });
+        settingsBtn.setOnClickListener( new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                launchPreferences(((view)));
+
+            }
+        });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -43,5 +56,26 @@ public class MainActivity extends AppCompatActivity {
     public void runAboutClass(View view){
         Intent i = new Intent(this, About.class);
         startActivity(i);
+    }
+    public void launchPreferences(View view){
+        Intent i = new Intent(this, PreferencesActivity.class);
+        startActivity(i);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id==R.id.preferences){
+            launchPreferences(null);
+        }
+        if (id == R.id.about){
+            runAboutClass(null);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
