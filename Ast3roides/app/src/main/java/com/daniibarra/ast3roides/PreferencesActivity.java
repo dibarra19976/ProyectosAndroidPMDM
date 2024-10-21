@@ -1,7 +1,9 @@
 package com.daniibarra.ast3roides;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,5 +15,8 @@ public class PreferencesActivity extends AppCompatActivity {
                 .replace(android.R.id.content, new
                         PreferencesFragment())
                 .commit();
+
     }
+
+
 }
