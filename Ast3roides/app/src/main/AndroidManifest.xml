@@ -28,6 +28,10 @@
             android:name=".PreferencesActivity"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".Scores"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

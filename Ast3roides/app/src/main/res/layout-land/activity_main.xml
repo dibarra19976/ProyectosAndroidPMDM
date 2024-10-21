@@ -62,7 +62,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/quitBtn"
+            android:id="@+id/scoreBtn"
             android:layout_width="180dp"
             android:layout_height="55dp"
 
