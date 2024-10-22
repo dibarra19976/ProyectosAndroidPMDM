@@ -5,18 +5,33 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.AppCompat.Light.Dialog"
     tools:context=".About">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="313dp"
-        android:layout_height="380dp"
-        android:text="@string/aboutString"
-        android:textAlignment="center"
-        android:textSize="20sp"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="30px"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:text="@string/aboutString"
+            android:textAlignment="textStart"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/backAbout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/back"
+            app:cornerRadius="20px" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

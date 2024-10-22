@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         scoreBtn.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                finish();
+                showScores((view));
             }
         });
         aboutBtn.setOnClickListener( new View.OnClickListener(){

@@ -6,7 +6,8 @@
     <string name="sortir">PUNTUACIONES</string>
     <string name="jugar">JUGAR</string>
     <string name="asteroides">Asteroides</string>
-    <string name="aboutString">APLICACION: Asteroides \nCREADOR: Daniel Angel Ibarra Moran \nAÑO DE CREACION: 2024 \nFECHA DE LA VERSION: 2024-10-21</string>
+    <string name="aboutString"><b>APLICACION</b>: Asteroides \n<b>DESARROLLADOR</b>: Daniel Angel Ibarra Moran \n<b>AÑO</b>: 2024 \n<b>ULTIMA VERSION</b>: 2024-10-21</string>
     <string name="preferencias">Preferencias</string>
     <string name="sobreMenu">Sobre...</string>
+    <string name="back">Atras</string>
 </resources>

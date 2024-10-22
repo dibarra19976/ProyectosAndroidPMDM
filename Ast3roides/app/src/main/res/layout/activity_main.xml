@@ -41,7 +41,6 @@
             android:insetTop="5dp"
             android:insetBottom="5dp"
             android:text="@string/jugar"
-            android:textSize="20sp"
             app:cornerRadius="20px" />
 
         <Button
@@ -53,7 +52,6 @@
             android:insetTop="5dp"
             android:insetBottom="5dp"
             android:text="@string/configurar"
-            android:textSize="20sp"
             app:cornerRadius="20px" />
 
         <Button
@@ -65,7 +63,6 @@
             android:insetTop="5dp"
             android:insetBottom="5dp"
             android:text="@string/sobre"
-            android:textSize="20sp"
             app:cornerRadius="20px" />
 
         <Button
@@ -76,7 +73,6 @@
             android:insetTop="5dp"
             android:insetBottom="5dp"
             android:text="@string/sortir"
-            android:textSize="20sp"
             app:cornerRadius="20px" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
