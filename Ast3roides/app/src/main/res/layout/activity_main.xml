@@ -13,6 +13,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/alata"
         android:text="@string/asteroides"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
