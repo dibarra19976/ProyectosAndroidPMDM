@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     Button scoreBtn;
     Button aboutBtn;
     Button settingsBtn;
+    Button playBtn;
     public static ScoreStorage scoreStorage= new ScoreStorageList();
 
     @Override
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         scoreBtn = findViewById(R.id.scoreBtn);
         aboutBtn = findViewById(R.id.aboutBtn);
         settingsBtn = findViewById(R.id.settingsBtn);
+        playBtn = findViewById(R.id.playBtn);
 
         scoreBtn.setOnClickListener( new View.OnClickListener(){
             @Override
@@ -41,6 +43,12 @@ public class MainActivity extends AppCompatActivity {
                 runAboutClass((view));
             }
         });
+        playBtn.setOnClickListener( new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                runGame((view));
+            }
+        });
         settingsBtn.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -48,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -81,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
     }
     public void showScores(View view) {
         Intent i = new Intent(this, Scores.class);
+        startActivity(i);
+    }
+    public void runGame(View view) {
+        Intent i = new Intent(this, GameActivity.class);
         startActivity(i);
     }
 }
