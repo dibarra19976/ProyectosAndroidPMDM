@@ -1,5 +1,6 @@
 package com.daniibarra.examen_2023;
 
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +20,7 @@ public class Animation extends AppCompatActivity {
     AnimationDrawable animacio;
     Button buttonAnimacionStart;
     Button buttonAnimacionParar;
+    Button buttonAnimacionSalir;
     ImageView imageView;
     Long totalTime = (long) 0;
     Long startTime;
@@ -33,6 +35,7 @@ public class Animation extends AppCompatActivity {
 
         buttonAnimacionStart = findViewById(R.id.buttonAnimacionStart);
         buttonAnimacionParar = findViewById(R.id.buttonAnimacionParar);
+        buttonAnimacionSalir = findViewById(R.id.buttonAnimacionSalir);
         imageView = findViewById(R.id.imageViewAnimacion);
         textViewAnimacionTiempo = findViewById(R.id.textViewAnimacionTiempo);
 
@@ -44,8 +47,18 @@ public class Animation extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                animacio.start();
-                startTime = System.currentTimeMillis();
+                if(!animacio.isRunning()){
+                    animacio.start();
+                    startTime = System.currentTimeMillis();
+                }
+
+            }
+        });
+        buttonAnimacionSalir.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                 onSortir();;
             }
         });
 
@@ -54,10 +67,14 @@ public class Animation extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                animacio.stop();
-                finishTime = System.currentTimeMillis();
-                totalTime = totalTime + (finishTime-startTime);
-                textViewAnimacionTiempo.setText(totalTime.toString());
+                if(animacio.isRunning()){
+                    animacio.stop();
+                    finishTime = System.currentTimeMillis();
+                    totalTime = totalTime + (finishTime-startTime);
+                    Double time = (double) totalTime/1000;
+                    textViewAnimacionTiempo.setText(""+time);
+                }
+
             }
         });
 
@@ -69,5 +86,23 @@ public class Animation extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    public void onSortir(){
+        Intent intent = new Intent();
+        animacio.stop();
+        finishTime = System.currentTimeMillis();
+        totalTime = totalTime + (finishTime-startTime);
+        Double time = (double) totalTime/1000;
+        intent.putExtra("resultat",""+time);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        onSortir();
+        super.onBackPressed();
+
     }
 }
