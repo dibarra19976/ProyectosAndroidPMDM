@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/main"
     android:background="@drawable/degradat"
+    android:clipChildren="false"
     >
 
     <TextView
@@ -22,6 +23,7 @@
         app:layout_constraintVertical_bias="0.153" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:clipChildren="false"
         android:layout_width="515dp"
         android:layout_height="125dp"
         app:layout_constraintBottom_toBottomOf="parent"

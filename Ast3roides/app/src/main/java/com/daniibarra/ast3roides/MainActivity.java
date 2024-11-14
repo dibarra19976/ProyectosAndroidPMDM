@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -26,10 +29,33 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+
+        TextView text = (TextView) findViewById(R.id.textView);
         scoreBtn = findViewById(R.id.scoreBtn);
         aboutBtn = findViewById(R.id.aboutBtn);
         settingsBtn = findViewById(R.id.settingsBtn);
         playBtn = findViewById(R.id.playBtn);
+
+
+        Animation animacio = AnimationUtils.loadAnimation(this,R.anim.gir_amb_zoom);
+        text.startAnimation(animacio);
+
+        Animation animacio2 = AnimationUtils.loadAnimation(this,R.anim.apareixer);
+        playBtn.startAnimation(animacio2);
+
+        Animation animacio3 = AnimationUtils.loadAnimation(this,R.anim.despl_dreta);
+        settingsBtn.startAnimation(animacio3);
+
+
+        Animation animacio4 = AnimationUtils.loadAnimation(this,R.anim.scale_from_0);
+        aboutBtn.startAnimation(animacio4);
+
+
+        Animation animacio5 = AnimationUtils.loadAnimation(this,R.anim.despli_baix);
+        scoreBtn.startAnimation(animacio5);
+        Animation animacio6 = AnimationUtils.loadAnimation(this,R.anim.gir_amb_zoom);
+
 
         scoreBtn.setOnClickListener( new View.OnClickListener(){
             @Override
@@ -40,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         aboutBtn.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick(View view){
+
+                view.startAnimation(animacio6);
                 runAboutClass((view));
             }
         });
