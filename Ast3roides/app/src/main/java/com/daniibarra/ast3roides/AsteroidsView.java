@@ -11,6 +11,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -29,6 +30,26 @@ public class AsteroidsView extends View {
     private List<AsteroidsGraphic> asteroids; // Vector amb el Asteroides
     private int numAsteroids = 5; // Número inicial d'asteroides
     private int numFragments = 3; // Fragments en que es divideix
+
+    // //// THREAD I TEMPS //////
+// Thread encarregat de processar el joc
+    private GameThread thread = new GameThread();
+    // Cada quan volem processar canvis (ms)
+    private static int ANIM_INTERVAL = 50;
+    // Quan es va realitzar el darrer procés
+    private long prevUpdate = 0;
+
+
+    class GameThread extends Thread {
+        @Override
+        public void run() {
+            while (true) {
+                updateView();
+            }
+        }
+    }
+
+
     public AsteroidsView(Context context, AttributeSet attrs) {
         super(context, attrs);
         Drawable drawableShip, drawableAsteroid, drawableMissile;
@@ -92,6 +113,7 @@ public class AsteroidsView extends View {
         }
         ship = new AsteroidsGraphic(this,drawableShip);
 
+
     }
     @Override protected void onSizeChanged(int width, int height,int prevWidth, int prevHeight) {
         super.onSizeChanged(width, height, prevWidth, prevHeight);
@@ -106,13 +128,102 @@ public class AsteroidsView extends View {
 
             ;
         }
-
+        prevUpdate = System.currentTimeMillis();
+        thread.start();
     }
-    @Override protected void onDraw(Canvas canvas) {
+    @Override protected synchronized void onDraw (Canvas canvas) {
         super.onDraw(canvas);
         for (AsteroidsGraphic asteroid: asteroids) {
             asteroid.drawGraphic(canvas);
         }
         ship.drawGraphic(canvas);
+    }
+
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        super.onKeyDown(keyCode, event);
+// Processam la pulsació
+        boolean processed = true;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_UP:
+                accelShip = 0;
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                ship.setRotSpeed(0);
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                ship.setRotSpeed(0);
+                break;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+
+
+            case KeyEvent.KEYCODE_ENTER:
+//fireMissile();
+                break;
+            default:
+// Si estem aquí, no hi ha pulsació que ens interessi
+                processed = false;
+                break;
+        }
+        return processed;
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        super.onKeyDown(keyCode, event);
+// Processam la pulsació
+        boolean processed = true;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_UP:
+                accelShip = +STEPSIZE_ACCEL_SHIP;
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                ship.setRotSpeed(-STEPSIZE_ROT_SHIP);
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                ship.setRotSpeed(STEPSIZE_ROT_SHIP);
+                break;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+
+
+            case KeyEvent.KEYCODE_ENTER:
+//fireMissile();
+                break;
+            default:
+// Si estem aquí, no hi ha pulsació que ens interessi
+                processed = false;
+                break;
+        }
+        return processed;
+    }
+
+    protected synchronized void updateView(){
+        long now = System.currentTimeMillis();
+// No fer res fins a final del període
+        if (prevUpdate + ANIM_INTERVAL > now){
+            return;
+        }
+// Per a una execució en temps real calculam retard
+        double delay = (now - prevUpdate) / ANIM_INTERVAL;
+
+
+
+        prevUpdate = now;
+// Actualitzam velocitat i direcció de la nau a partir de
+// ship.rotAngle, ship.rotSpeed, and accelShip
+        ship.setRotAngle((int) (ship.getRotAngle() + ship.getRotSpeed()
+                * delay));
+        double nIncX = ship.getIncX() + accelShip *
+                Math.cos(Math.toRadians(ship.getRotAngle())) * delay;
+        double nIncY = ship.getIncY() + accelShip *
+                Math.sin(Math.toRadians(ship.getRotAngle())) * delay;
+// Actualitzam si el mòdul de la velocitat no excedeix el màxim
+        if (Math.hypot(nIncX,nIncY) <= SHIP_MAX_SPEED){
+            ship.setIncX(nIncX);
+            ship.setIncY(nIncY);
+        }
+// Actualitzam posicions X i Y
+        ship.updatePos(delay);
+        for (AsteroidsGraphic asteroid : asteroids) {
+            asteroid.updatePos(delay);
+        }
     }
 }
