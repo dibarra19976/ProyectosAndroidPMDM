@@ -1,5 +1,6 @@
 package com.daniibarra.examen_2023;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -89,14 +90,16 @@ public class Animation extends AppCompatActivity {
     }
 
     public void onSortir(){
-        Intent intent = new Intent();
         animacio.stop();
         finishTime = System.currentTimeMillis();
         totalTime = totalTime + (finishTime-startTime);
         Double time = (double) totalTime/1000;
+
+        Intent intent = new Intent();
         intent.putExtra("resultat",""+time);
-        setResult(RESULT_OK, intent);
+        setResult(Activity.RESULT_OK, intent);
         finish();
+
     }
 
     @Override

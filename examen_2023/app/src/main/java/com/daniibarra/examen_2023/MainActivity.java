@@ -1,5 +1,6 @@
 package com.daniibarra.examen_2023;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -85,7 +86,8 @@ public class MainActivity extends AppCompatActivity {
     }
     public void startVector(View view){
         Intent intent = new Intent(this, Vector.class);
-        startActivity(intent);
+        startActivityForResult(intent, 12345);
+
     }
     public void startMapa(View view){
         Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse("geo:40.05722693707509, 4.13093944467142"));
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==1234 && resultCode==RESULT_OK) {
+        if (requestCode==1234 && resultCode== Activity.RESULT_OK) {
             String res = data.getStringExtra("resultat");
             TextView text = findViewById(R.id.textViewAnimacionTiempo);
             text.setText(res);
