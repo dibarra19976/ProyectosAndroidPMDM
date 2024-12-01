@@ -13,6 +13,13 @@
         android:entries="@array/tipusGrafics"
         android:entryValues="@array/tipusGraficsValors"
         android:defaultValue="1"/>
+    <ListPreference
+        android:key="controls"
+        android:title="Tipus de controls"
+        android:summary="Escollir el tipos de controls per el joc"
+        android:entries="@array/tipusControls"
+        android:entryValues="@array/tipusControlsValors"
+        android:defaultValue="1"/>
     <EditTextPreference
         android:key="fragments"
         android:title="Número de fragments"

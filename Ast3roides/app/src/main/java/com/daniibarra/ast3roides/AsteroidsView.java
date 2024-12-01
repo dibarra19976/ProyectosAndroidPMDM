@@ -9,15 +9,21 @@ import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
+import android.graphics.drawable.shapes.RectShape;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AsteroidsView extends View {
+public class AsteroidsView extends View implements SensorEventListener {
     private AsteroidsGraphic ship; // Gràfic de la nau
     private int angleShip; // Angle de gir de la nau
     private float accelShip; // Augment de velocitat
@@ -39,6 +45,59 @@ public class AsteroidsView extends View {
     // Quan es va realitzar el darrer procés
     private long prevUpdate = 0;
 
+    private float mX = 0, mY = 0;
+    private boolean fire = false;
+
+
+    ///SENSORS///
+    private float initValue;
+    private boolean initValueValid = false;
+
+    // //// MISIL //////
+    private AsteroidsGraphic missile;
+    private static int MISSILE_SPEED = 12;
+    private boolean missileActive = false;
+    private int missileLifetime;
+    private List<AsteroidsGraphic> missiles = new ArrayList<>();
+    private List<Double> missileLifetimes = new ArrayList<>();
+    Drawable drawableMissile;
+    /// Controls ///
+    String controls ;
+
+    public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
+        if(controls.equals("1")){
+            float x = event.getX();
+            float y = event.getY();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    fire = true;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float dx = Math.abs(x - mX);
+                    float dy = Math.abs(y - mY);
+                    if (dy < 6 && dx > 6) {
+                        ship.setRotSpeed(Math.round((x - mX) / 2));
+                        fire = false;
+                    } else if (dx < 6 && dy > 6) {
+                        accelShip = Math.round((mY - y) / 25);
+                        fire = false;
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    ship.setRotSpeed(0);
+                    accelShip = 0;
+                    if (fire) {
+                        fireMissile();
+                    }
+                    break;
+            }
+            mX = x;
+            mY = y;
+        }
+        return true;
+    }
+
 
     class GameThread extends Thread {
         @Override
@@ -52,9 +111,12 @@ public class AsteroidsView extends View {
 
     public AsteroidsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Drawable drawableShip, drawableAsteroid, drawableMissile;
+        Drawable drawableShip, drawableAsteroid;
 
         SharedPreferences pref =PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        controls = pref.getString("controls","2");
+
         if (pref.getString("grafics", "1").equals("0")) {
             setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             Path pathAsteroid = new Path();
@@ -92,11 +154,18 @@ public class AsteroidsView extends View {
 
             drawableShip = dShip;
             setBackgroundColor(Color.BLACK);
+
+            ShapeDrawable dMissile = new ShapeDrawable(new RectShape());
+            dMissile.getPaint().setColor(Color.WHITE);
+            dMissile.getPaint().setStyle(Paint.Style.STROKE);
+            dMissile.setIntrinsicWidth(15);
+            dMissile.setIntrinsicHeight(3);
+            drawableMissile = dMissile;
         } else {
             setLayerType(View.LAYER_TYPE_HARDWARE, null);
             drawableAsteroid = context.getResources().getDrawable(R.drawable.asteroide1);
             drawableShip = context.getResources().getDrawable(R.drawable.nave);
-
+            drawableMissile = context.getResources().getDrawable(R.drawable.misil1);
         }
 
         asteroids = new ArrayList<>();
@@ -112,6 +181,14 @@ public class AsteroidsView extends View {
 
         }
         ship = new AsteroidsGraphic(this,drawableShip);
+        missile = new AsteroidsGraphic(this, drawableMissile);
+
+        SensorManager mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        List<Sensor> sensorList = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+        if (!sensorList.isEmpty()) {
+            Sensor accelerometerSensor = sensorList.get(0);
+            mSensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+        }
 
 
     }
@@ -137,32 +214,39 @@ public class AsteroidsView extends View {
             asteroid.drawGraphic(canvas);
         }
         ship.drawGraphic(canvas);
+        for (AsteroidsGraphic missile : missiles) {
+            missile.drawGraphic(canvas);
+        }
+
     }
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        super.onKeyDown(keyCode, event);
+        super.onKeyUp(keyCode, event);
 // Processam la pulsació
         boolean processed = true;
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_UP:
-                accelShip = 0;
-                break;
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                ship.setRotSpeed(0);
-                break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                ship.setRotSpeed(0);
-                break;
-            case KeyEvent.KEYCODE_DPAD_CENTER:
+        if(controls.equals("0")){
+
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_UP:
+                    accelShip = 0;
+                    break;
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                    ship.setRotSpeed(0);
+                    break;
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    ship.setRotSpeed(0);
+                    break;
+                case KeyEvent.KEYCODE_DPAD_CENTER:
 
 
-            case KeyEvent.KEYCODE_ENTER:
-//fireMissile();
-                break;
-            default:
+                case KeyEvent.KEYCODE_ENTER:
+                    fireMissile();
+                    break;
+                default:
 // Si estem aquí, no hi ha pulsació que ens interessi
-                processed = false;
-                break;
+                    processed = false;
+                    break;
+            }
         }
         return processed;
     }
@@ -171,6 +255,8 @@ public class AsteroidsView extends View {
         super.onKeyDown(keyCode, event);
 // Processam la pulsació
         boolean processed = true;
+        if(controls.equals("0")){
+
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_UP:
                 accelShip = +STEPSIZE_ACCEL_SHIP;
@@ -185,13 +271,14 @@ public class AsteroidsView extends View {
 
 
             case KeyEvent.KEYCODE_ENTER:
-//fireMissile();
+                fireMissile();
                 break;
             default:
 // Si estem aquí, no hi ha pulsació que ens interessi
                 processed = false;
                 break;
-        }
+        }  }
+
         return processed;
     }
 
@@ -225,5 +312,73 @@ public class AsteroidsView extends View {
         for (AsteroidsGraphic asteroid : asteroids) {
             asteroid.updatePos(delay);
         }
+
+       /* if (missileActive) {
+            missile.updatePos(delay);
+            missileLifetime-=delay;
+            if (missileLifetime < 0) {
+                missileActive = false;
+            } else {
+                for (int i = 0; i < asteroids.size(); i++)
+                    if (missile.checkCollision(asteroids.get(i))) {
+                        destroyAsteroid(i);
+                        break;
+                    }
+            }
+        }*/
+
+        for (int i = 0; i < missiles.size(); i++) {
+            AsteroidsGraphic missile = missiles.get(i);
+            missile.updatePos(delay);
+            missileLifetimes.set(i, missileLifetimes.get(i) - delay);
+
+            if (missileLifetimes.get(i) < 0) {
+                missiles.remove(i);
+                missileLifetimes.remove(i);
+                i--;
+            } else {
+                for (int j = 0; j < asteroids.size(); j++) {
+                    if (missile.checkCollision(asteroids.get(j))) {
+                        destroyAsteroid(j);
+                        missiles.remove(i);
+                        missileLifetimes.remove(i);
+                        i--;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if(controls.equals("2")){
+            float value = sensorEvent.values[1];
+            if (!initValueValid){
+                initValue = value;
+                initValueValid = true;
+            }
+            //accelShip = +STEPSIZE_ACCEL_SHIP;
+            ship.setRotSpeed((int) (value-initValue)/3) ;
+            accelShip = sensorEvent.values[2] / 20;
+        }
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    private void destroyAsteroid(int i) {
+        asteroids.remove(i);
+    }
+    private void fireMissile() {
+        AsteroidsGraphic newMissile = new AsteroidsGraphic(this, drawableMissile);
+        newMissile.setCenX(ship.getCenX());
+        newMissile.setCenY(ship.getCenY());
+        newMissile.setRotAngle(ship.getRotAngle());
+        newMissile.setIncX(Math.cos(Math.toRadians(newMissile.getRotAngle())) * MISSILE_SPEED);
+        newMissile.setIncY(Math.sin(Math.toRadians(newMissile.getRotAngle())) * MISSILE_SPEED);
+
+        missiles.add(newMissile);  // Afegim el nou míssil a la llista
+        missileLifetimes.add((double) Math.min(this.getWidth() / Math.abs(newMissile.getIncX()), this.getHeight() / Math.abs(newMissile.getIncY())) - 2);  // Afegim el temps de vida
     }
 }
