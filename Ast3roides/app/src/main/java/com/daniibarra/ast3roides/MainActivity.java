@@ -1,7 +1,10 @@
 package com.daniibarra.ast3roides;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,17 +21,33 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String STATE_MUSIC = "musicpos";
     Button scoreBtn;
     Button aboutBtn;
     Button settingsBtn;
     Button playBtn;
+    boolean musicEnabled = false;
+    MediaPlayer mp;
+    int pos;
+
     public static ScoreStorage scoreStorage= new ScoreStorageList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        musicEnabled = pref.getBoolean("musica",false);
+
+        if(musicEnabled){
+            mp = MediaPlayer.create(this, R.raw.audio);
+            mp.start();
+
+        }
 
 
         TextView text = (TextView) findViewById(R.id.textView);
@@ -91,6 +110,50 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        if(musicEnabled){
+            mp.pause();
+        }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(musicEnabled){
+            mp.start();
+        }
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle bundle){
+
+        super.onSaveInstanceState(bundle);
+
+        if(musicEnabled){
+            pos = mp.getCurrentPosition();
+            bundle.putInt(STATE_MUSIC, pos);
+
+        }
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle bundle){
+        if (bundle != null) {
+            pos = bundle.getInt(STATE_MUSIC);
+            mp.seekTo(pos);
+
+        }
+        super.onRestoreInstanceState(bundle);
+
+
+    }
+
     public void runAboutClass(View view){
         Intent i = new Intent(this, About.class);
         startActivity(i);
@@ -124,4 +187,6 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(this, GameActivity.class);
         startActivity(i);
     }
+
+
 }

@@ -100,4 +100,8 @@ public class AsteroidsGraphic {
     public void setIncX(double incX) {
         this.incX = incX;
     }
+
+    public Drawable getDrawable() {
+        return drawable;
+    }
 }

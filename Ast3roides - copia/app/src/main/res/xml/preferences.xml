@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferencies_principal" >
+    <CheckBoxPreference
+        android:key="musica"
+        android:title="Reproduir música"
+        android:summary="Se reprodueix música de fons"/>
+    <ListPreference
+        android:key="grafics"
+        android:title="Tipus de gràfics"
+        android:summary="Escollir la representació de gràficos"
+        android:entries="@array/tipusGrafics"
+        android:entryValues="@array/tipusGraficsValors"
+        android:defaultValue="1"/>
+    <ListPreference
+        android:key="controls"
+        android:title="Tipus de controls"
+        android:summary="Escollir el tipos de controls per el joc"
+        android:entries="@array/tipusControls"
+        android:entryValues="@array/tipusControlsValors"
+        android:defaultValue="1"/>
+    <EditTextPreference
+        android:key="fragments"
+        android:title="Número de fragments"
+        android:summary="En quants trossos es divideix un
+asteroide"
+        android:inputType="number"
+        android:defaultValue="3"/>
+    <PreferenceCategory android:title="Modo multijugador">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="check_box_preference_1"
+            android:title="Activar multijugador" />
+        <EditTextPreference
+            android:defaultValue="Default value"
+            android:key="edit_text_preference_1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Maximo de jugadores" />
+        <EditTextPreference
+            android:defaultValue="Default value"
+            android:key="edit_text_preference_1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Tipo de conexion" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

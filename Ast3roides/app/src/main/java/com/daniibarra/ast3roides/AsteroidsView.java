@@ -14,6 +14,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -61,8 +63,18 @@ public class AsteroidsView extends View implements SensorEventListener {
     private List<AsteroidsGraphic> missiles = new ArrayList<>();
     private List<Double> missileLifetimes = new ArrayList<>();
     Drawable drawableMissile;
+    
     /// Controls ///
     String controls ;
+    SensorManager mSensorManager;
+
+    /// SOns ///
+    SoundPool soundPool;
+    int idFire, idExplosion;
+
+    /// SOns ///
+    private Drawable[] drawableAsteroid = new Drawable[3];
+    int fragmentso;
 
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
@@ -100,22 +112,49 @@ public class AsteroidsView extends View implements SensorEventListener {
 
 
     class GameThread extends Thread {
-        @Override
-        public void run() {
-            while (true) {
+        private boolean paused, running;
+        public synchronized void pause() {
+            paused = true;
+        }
+        public synchronized void unpause() {
+            paused = false;
+            notify();
+        }
+        public void halt() {
+            running = false;
+            if (paused) unpause();
+        }
+        @Override public void run() {
+            running = true;
+            while (running) {
                 updateView();
+                synchronized (this) {
+                    while (paused)
+                        try {
+                            wait();
+                        } catch (Exception e) {
+                        }
+                }
             }
         }
     }
 
+    public GameThread getThread() {
+        return thread;
+    }
+
+    public void setThread(GameThread thread) {
+        this.thread = thread;
+    }
 
     public AsteroidsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Drawable drawableShip, drawableAsteroid;
+        Drawable drawableShip;
 
         SharedPreferences pref =PreferenceManager.getDefaultSharedPreferences(getContext());
 
         controls = pref.getString("controls","2");
+        fragmentso = Integer.parseInt(pref.getString("fragments", "1"));
 
         if (pref.getString("grafics", "1").equals("0")) {
             setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -134,12 +173,15 @@ public class AsteroidsView extends View implements SensorEventListener {
             pathAsteroid.lineTo((float) 0.3, (float) 0.0);
 
 
-            ShapeDrawable dAsteroid = new ShapeDrawable(new PathShape(pathAsteroid, 1, 1));
-            dAsteroid.getPaint().setColor(Color.WHITE);
-            dAsteroid.getPaint().setStyle(Paint.Style.STROKE);
-            dAsteroid.setIntrinsicWidth(50);
-            dAsteroid.setIntrinsicHeight(50);
-            drawableAsteroid = dAsteroid;
+            for (int i=0; i<drawableAsteroid.length; i++) {
+                ShapeDrawable dAsteroid = new ShapeDrawable(new PathShape(
+                        pathAsteroid, 1, 1));
+                dAsteroid.getPaint().setColor(Color.WHITE);
+                dAsteroid.getPaint().setStyle(Paint.Style.STROKE);
+                dAsteroid.setIntrinsicWidth(50 - i * 14);
+                dAsteroid.setIntrinsicHeight(50 - i * 14);
+                drawableAsteroid[i] = dAsteroid;
+            }
 
             Path pathShip = new Path();
             pathShip.lineTo((float) 0, (float) 0);
@@ -161,16 +203,23 @@ public class AsteroidsView extends View implements SensorEventListener {
             dMissile.setIntrinsicWidth(15);
             dMissile.setIntrinsicHeight(3);
             drawableMissile = dMissile;
+
+
         } else {
             setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            drawableAsteroid = context.getResources().getDrawable(R.drawable.asteroide1);
             drawableShip = context.getResources().getDrawable(R.drawable.nave);
             drawableMissile = context.getResources().getDrawable(R.drawable.misil1);
+            drawableAsteroid[0] = context.getResources().
+                    getDrawable(R.drawable.asteroide1);
+            drawableAsteroid[1] = context.getResources().
+                    getDrawable(R.drawable.asteroide2);
+            drawableAsteroid[2] = context.getResources().
+                    getDrawable(R.drawable.asteroide3);
         }
 
         asteroids = new ArrayList<>();
         for (int i = 0; i < numAsteroids; i++) {
-            AsteroidsGraphic asteroid = new AsteroidsGraphic(this,drawableAsteroid);
+            AsteroidsGraphic asteroid = new AsteroidsGraphic(this,drawableAsteroid[1]);
             asteroid.setIncY(Math.random() * 4 - 2);
 
             asteroid.setIncX(Math.random() * 4 - 2);
@@ -183,13 +232,13 @@ public class AsteroidsView extends View implements SensorEventListener {
         ship = new AsteroidsGraphic(this,drawableShip);
         missile = new AsteroidsGraphic(this, drawableMissile);
 
-        SensorManager mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> sensorList = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if (!sensorList.isEmpty()) {
-            Sensor accelerometerSensor = sensorList.get(0);
-            mSensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
-        }
+        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 
+        activateSensors();
+
+        soundPool = new SoundPool( 5, AudioManager.STREAM_MUSIC , 0);
+        idFire = soundPool.load(context, R.raw.dispar, 0);
+        idExplosion = soundPool.load(context, R.raw.explosio, 0);
 
     }
     @Override protected void onSizeChanged(int width, int height,int prevWidth, int prevHeight) {
@@ -368,7 +417,29 @@ public class AsteroidsView extends View implements SensorEventListener {
     }
 
     private void destroyAsteroid(int i) {
+        if (asteroids.get(i).getDrawable()!=drawableAsteroid[2]){
+            int size;
+            if (asteroids.get(i).getDrawable()==drawableAsteroid[1]){
+                size=2;
+            } else {
+
+                size=1;
+            }
+            for(int n=0;n<fragmentso;n++){
+                AsteroidsGraphic asteroid = new AsteroidsGraphic
+                        (this,drawableAsteroid[size]);
+                asteroid.setCenX(asteroids.get(i).getCenX());
+                asteroid.setCenY(asteroids.get(i).getCenY());
+                asteroid.setIncX(Math.random()*7-2-size);
+                asteroid.setIncY(Math.random()*7-2-size);
+                asteroid.setRotAngle((int)(Math.random()*360));
+                asteroid.setRotSpeed((int)(Math.random()*8-4));
+                asteroids.add(asteroid);
+            }
+        }
+
         asteroids.remove(i);
+        soundPool.play(idExplosion, 1, 1, 0, 0, 1);
     }
     private void fireMissile() {
         AsteroidsGraphic newMissile = new AsteroidsGraphic(this, drawableMissile);
@@ -380,5 +451,19 @@ public class AsteroidsView extends View implements SensorEventListener {
 
         missiles.add(newMissile);  // Afegim el nou míssil a la llista
         missileLifetimes.add((double) Math.min(this.getWidth() / Math.abs(newMissile.getIncX()), this.getHeight() / Math.abs(newMissile.getIncY())) - 2);  // Afegim el temps de vida
+        soundPool.play(idFire, 1, 1, 1, 0, 1);
     }
+
+    public void activateSensors(){
+        List<Sensor> sensorList = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+        if (!sensorList.isEmpty()) {
+            Sensor accelerometerSensor = sensorList.get(0);
+            mSensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+        }
+    }
+    public void deactivateSensors(){
+        mSensorManager.unregisterListener(this);
+    }
+
+
 }
