@@ -1,7 +1,9 @@
 package com.daniibarra.ast3roides;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ServiceInfo;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static ScoreStorage scoreStorage= new ScoreStorageList();
 
+    ReceptorBateria receptorBateria;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -43,11 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
         musicEnabled = pref.getBoolean("musica",false);
 
-        if(musicEnabled){
-            mp = MediaPlayer.create(this, R.raw.audio);
-            mp.start();
-
-        }
+        //if(musicEnabled){
+            //mp = MediaPlayer.create(this, R.raw.audio);
+            //mp.start();
+            //startService(new Intent(MainActivity.this, ServiceInfo.class));
+       // }
 
 
         TextView text = (TextView) findViewById(R.id.textView);
@@ -109,6 +113,12 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
+        receptorBateria = new ReceptorBateria();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_LOW);
+        this.registerReceiver(receptorBateria, filter);
     }
 
 
@@ -116,16 +126,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
         if(musicEnabled){
-            mp.pause();
+            //mp.pause();
+            stopService(new Intent(MainActivity.this, ServiceInfo.class));
+
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopService(new Intent(MainActivity.this, ServeiMusica.class));
+
     }
 
     @Override
     protected void onResume(){
         super.onResume();
         if(musicEnabled){
-            mp.start();
+            //mp.start();
+            startService(new Intent(MainActivity.this, ServiceInfo.class));
+
         }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(MainActivity.this, ServeiMusica.class));
     }
 
 
@@ -135,8 +161,8 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(bundle);
 
         if(musicEnabled){
-            pos = mp.getCurrentPosition();
-            bundle.putInt(STATE_MUSIC, pos);
+            //pos = mp.getCurrentPosition();
+            //bundle.putInt(STATE_MUSIC, pos);
 
         }
 
@@ -145,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle bundle){
         if (bundle != null) {
-            pos = bundle.getInt(STATE_MUSIC);
-            mp.seekTo(pos);
+            //pos = bundle.getInt(STATE_MUSIC);
+            //mp.seekTo(pos);
 
         }
         super.onRestoreInstanceState(bundle);

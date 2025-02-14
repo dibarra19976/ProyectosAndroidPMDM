@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity {
             //Codi per enviar missatges
             Toast.makeText(this, "Permis per enviar SMS concedit", Toast.LENGTH_SHORT).show();
         } else{
-            requestPermissions(new String[] {
-                    android.Manifest.permission.SEND_SMS},REQUEST_CODE);
-        };
+            requestPermissions(new String[] {android.Manifest.permission.SEND_SMS},REQUEST_CODE);};
     }
 }

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <permission
+        android:name="com.payperview.serveis.VEURE_VIDEOS"
+        android:description="@string/descripcio"
+        android:label="@string/etiqueta"
+        android:protectionLevel="dangerous" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -27,9 +31,5 @@
         </activity>
 
     </application>
-    <permission
-        android:name="com.payperview.serveis.VEURE_VIDEOS"
-        android:description="@string/descripcio"
-        android:label="@string/etiqueta"
-        android:protectionLevel="dangerous" />
+
 </manifest>

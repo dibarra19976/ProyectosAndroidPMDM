@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.widget.Toast;
 
 public class ServeiMusica extends Service {
+
     MediaPlayer reproductor;
     @Override
     public void onCreate() {
